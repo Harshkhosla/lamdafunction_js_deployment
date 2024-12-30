@@ -1,0 +1,10 @@
+functions:
+  app:
+    handler: lambda.handler
+    events:
+      - http:
+          path: /
+          method: any
+      - http:
+          path: '{proxy+}'
+          method: any
