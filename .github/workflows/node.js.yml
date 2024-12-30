@@ -18,15 +18,14 @@ jobs:
       with:
         node-version: 18
 
-    - name: Install Dependencies
+    - name: Install Production Dependencies
       run: npm install --production
 
     - name: Prepare Deployment Package
       run: |
         mkdir package
-        cp -R * package/
-        cp -R .env package/
-        rm -rf package/node_modules
+        shopt -s extglob
+        cp -R !(package|node_modules) package/
         cd package
         zip -r ../lambda.zip ./
         cd ..
@@ -37,5 +36,5 @@ jobs:
         aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws_region: us-east-1
-        function_name: lamdafunction_test_1
+        function_name: lamdafunction_test
         zip_file: ./lambda.zip
