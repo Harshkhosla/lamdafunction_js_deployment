@@ -19,15 +19,17 @@ jobs:
         node-version: 18
 
     - name: Install Dependencies
-      run: npm install
+      run: npm install --production
 
-    - name: Build the Project
-      run: npm run build
-
-    - name: Zip Deployment Package
+    - name: Prepare Deployment Package
       run: |
-        cd dist
+        mkdir package
+        cp -R * package/
+        cp -R .env package/
+        rm -rf package/node_modules
+        cd package
         zip -r ../lambda.zip ./
+        cd ..
 
     - name: Deploy to AWS Lambda
       uses: appleboy/lambda-action@v0.0.6
@@ -35,5 +37,5 @@ jobs:
         aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws_region: us-east-1
-        function_name: lamdafunction_test
+        function_name: lamdafunction_test_1
         zip_file: ./lambda.zip
