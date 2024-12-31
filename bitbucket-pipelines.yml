@@ -1,0 +1,25 @@
+pipelines:
+  branches:
+    main:
+      - step:
+          name: Build and Deploy to AWS Lambda
+          deployment: production
+          image: node:18
+          caches:
+            - node
+          script:
+            - echo "Installing dependencies..."
+            - npm install --production
+            - echo "Installing zip utility..."
+            - apt-get update && apt-get install -y zip
+            - echo "Preparing deployment package..."
+            - mkdir package
+            - shopt -s extglob
+            - cp -R !(package|node_modules) package/
+            - cd package
+            - zip -r ../lambda.zip ./
+            - cd ..
+            - echo "Installing AWS CLI..."
+            - apt-get update && apt-get install -y awscli
+            - echo "Deploying to AWS Lambda..."
+            - aws lambda update-function-code --region us-east-1 --function-name lamdafunction_test_1 --zip-file fileb://lambda.zip
